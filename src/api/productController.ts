@@ -62,6 +62,21 @@ export async function listProductByPageUsingPost(
   })
 }
 
+/** listMyProductByPage POST /api/product/my/list/page */
+export async function listMyProductByPageUsingPost(
+  body: API.ProductQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePageProductVO_>('/api/product/my/list/page', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** reviewProduct POST /api/product/review */
 export async function reviewProductUsingPost(
   body: API.ProductReviewRequest,

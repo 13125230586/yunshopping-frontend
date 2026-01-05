@@ -22,9 +22,12 @@
           </a-badge>
           <template v-if="userStore.isLogin">
             <a-dropdown>
-              <a-button type="text">
-                <user-outlined /> {{ userStore.userInfo?.userName || '用户' }}
-              </a-button>
+              <div class="user-info">
+                <a-avatar :src="userStore.userInfo?.userAvatar" :size="32">
+                  {{ userStore.userInfo?.userName?.charAt(0) || 'U' }}
+                </a-avatar>
+                <span class="user-name">{{ userStore.userInfo?.userName || '用户' }}</span>
+              </div>
               <template #overlay>
                 <a-menu>
                   <a-menu-item @click="$router.push('/user/profile')">个人中心</a-menu-item>
@@ -171,6 +174,25 @@ const handleLogout = async () => {
       display: flex;
       gap: 16px;
       align-items: center;
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 4px 12px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #f5f5f5;
+        }
+
+        .user-name {
+          font-size: 14px;
+          color: #333;
+        }
+      }
     }
   }
 

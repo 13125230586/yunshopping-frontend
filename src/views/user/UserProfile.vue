@@ -20,14 +20,31 @@
                     class="user-avatar"
                   />
                   <div class="avatar-input">
-                    <a-input
-                      v-model:value="profileForm.userAvatar"
-                      placeholder="请输入头像URL"
-                      style="margin-bottom: 8px"
-                    />
-                    <a-typography-text type="secondary" style="font-size: 12px">
-                      提示:请输入图片链接地址
-                    </a-typography-text>
+                    <a-upload
+                      :show-upload-list="false"
+                      :before-upload="beforeAvatarUpload"
+                      :custom-request="handleAvatarUpload"
+                      accept="image/*"
+                    >
+                      <a-button type="primary" :loading="avatarUploading">
+                        <upload-outlined />
+                        {{ avatarUploading ? '上传中...' : '上传头像' }}
+                      </a-button>
+                    </a-upload>
+                    <a-button
+                      v-if="profileForm.userAvatar"
+                      danger
+                      style="margin-left: 8px"
+                      @click="handleDeleteAvatar"
+                    >
+                      <delete-outlined />
+                      删除头像
+                    </a-button>
+                    <div style="margin-top: 8px">
+                      <a-typography-text type="secondary" style="font-size: 12px">
+                        支持常见图片格式，大小不超过 5MB
+                      </a-typography-text>
+                    </div>
                   </div>
                 </div>
               </a-form-item>
@@ -168,9 +185,11 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
-import type { FormInstance } from 'ant-design-vue'
+import { UploadOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import type { FormInstance, UploadProps } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
 import { updateProfileUsingPost, updatePasswordUsingPost } from '@/api/yonghujiekou'
+import { uploadAvatarOssUsingPost, deleteFileByUrlOssUsingPost } from '@/api/fileController'
 
 const userStore = useUserStore()
 const activeTab = ref('profile')
@@ -178,6 +197,7 @@ const activeTab = ref('profile')
 const profileLoading = ref(false)
 const passwordLoading = ref(false)
 const passwordFormRef = ref<FormInstance>()
+const avatarUploading = ref(false)
 
 const profileForm = reactive({
   userName: '',
@@ -190,6 +210,17 @@ const passwordForm = reactive({
   newPassword: '',
   checkPassword: '',
 })
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/bmp',
+  'image/svg+xml'
+]
 
 onMounted(() => {
   initProfileForm()
@@ -313,6 +344,63 @@ const handleResetPassword = () => {
   passwordForm.newPassword = ''
   passwordForm.checkPassword = ''
   passwordFormRef.value?.clearValidate()
+}
+
+const beforeAvatarUpload = (file: File) => {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    message.error('只支持常见图片格式(JPG/PNG/GIF/WEBP/BMP/SVG)')
+    return false
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    message.error('图片大小不能超过 5MB')
+    return false
+  }
+  return true
+}
+
+const handleAvatarUpload = async (options: any) => {
+  const { file } = options
+
+  if (!beforeAvatarUpload(file)) {
+    return
+  }
+
+  avatarUploading.value = true
+  try {
+    const res = await uploadAvatarOssUsingPost({}, file)
+
+    if (res.code === 0 && res.data) {
+      profileForm.userAvatar = res.data.url || ''
+      message.success('头像上传成功')
+    } else {
+      message.error(res.message || '上传失败')
+    }
+  } catch (error: any) {
+    console.error('头像上传失败 uid:', userStore.userInfo?.id, error)
+    message.error(error.message || '上传失败')
+  } finally {
+    avatarUploading.value = false
+  }
+}
+
+const handleDeleteAvatar = async () => {
+  if (!profileForm.userAvatar) {
+    return
+  }
+
+  try {
+    const res = await deleteFileByUrlOssUsingPost({ fileUrl: profileForm.userAvatar })
+
+    if (res.code === 0) {
+      profileForm.userAvatar = ''
+      message.success('头像删除成功')
+    } else {
+      message.error(res.message || '删除失败')
+    }
+  } catch (error: any) {
+    console.error('删除头像失败 uid:', userStore.userInfo?.id, 'fileUrl:', profileForm.userAvatar, error)
+    message.error(error.message || '删除失败')
+  }
 }
 </script>
 

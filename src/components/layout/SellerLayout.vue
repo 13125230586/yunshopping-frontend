@@ -30,9 +30,13 @@
         <div class="header-right">
           <a-button @click="$router.push('/')">返回商城</a-button>
           <a-dropdown>
-            <a-avatar>{{ userStore.userInfo?.userName?.charAt(0) }}</a-avatar>
+            <a-avatar :src="userStore.userInfo?.userAvatar" :size="40" class="user-avatar">
+              {{ userStore.userInfo?.userName?.charAt(0) || 'U' }}
+            </a-avatar>
             <template #overlay>
               <a-menu>
+                <a-menu-item @click="$router.push('/user/profile')">个人中心</a-menu-item>
+                <a-menu-divider />
                 <a-menu-item @click="handleLogout">退出登录</a-menu-item>
               </a-menu>
             </template>
@@ -113,6 +117,15 @@ const handleLogout = async () => {
     display: flex;
     align-items: center;
     gap: 16px;
+
+    .user-avatar {
+      cursor: pointer;
+      transition: transform 0.3s;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
   }
 }
 

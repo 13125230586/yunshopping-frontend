@@ -279,6 +279,11 @@ declare namespace API {
     paymentMethod: number
   }
 
+  type deleteFileByUrlOssUsingPOSTParams = {
+    /** fileUrl */
+    fileUrl: string
+  }
+
   type deleteFileByUrlUsingPOSTParams = {
     /** fileUrl */
     fileUrl: string
@@ -499,6 +504,7 @@ declare namespace API {
     sortField?: string
     sortOrder?: string
     status?: number
+    userId?: number
   }
 
   type ProductReviewRequest = {
@@ -552,6 +558,7 @@ declare namespace API {
     stock?: number
     tags?: string
     unit?: string
+    userId?: number
     viewCount?: number
     weight?: number
   }

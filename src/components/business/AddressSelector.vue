@@ -9,8 +9,8 @@
           </a-button>
         </div>
       </div>
-      <a-radio-group v-else v-model:value="selectedAddressId" @change="handleChange">
-        <div v-for="address in addressStore.addressList" :key="address.id" class="address-item">
+      <a-radio-group v-else v-model:value="selectedAddressId" class="address-radio-group">
+        <div v-for="address in addressStore.addressList" :key="address.id" class="address-item" :class="{ 'address-selected': selectedAddressId === address.id }">
           <a-radio :value="address.id">
             <div class="address-content">
               <div class="address-header">
@@ -87,18 +87,35 @@ const handleAddressSuccess = async () => {
 
 <style scoped lang="less">
 .address-selector {
+  .address-radio-group {
+    width: 100%;
+    display: block;
+  }
+
   .address-item {
     padding: 16px;
     border: 1px solid #f0f0f0;
     margin-bottom: 8px;
     border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
 
     &:hover {
       border-color: #1890ff;
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+    }
+
+    &.address-selected {
+      border-color: #1890ff;
+      background-color: #f0f7ff;
+    }
+
+    :deep(.ant-radio) {
+      align-self: flex-start;
     }
 
     .address-content {
-      padding-left: 24px;
+      padding-left: 8px;
 
       .address-header {
         margin-bottom: 8px;

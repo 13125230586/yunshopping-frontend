@@ -39,8 +39,32 @@
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'totalAmount'">
-            ¥{{ record.totalAmount?.toFixed(2) }}
+          <template v-if="column.key === 'productInfo'">
+            <div v-if="record.orderItems && record.orderItems.length > 0" class="product-info">
+              <a-image
+                :src="record.orderItems[0].productImage"
+                :width="60"
+                :height="60"
+                class="product-image"
+              />
+              <div class="product-detail">
+                <div class="product-name">{{ record.orderItems[0].productName }}</div>
+                <div class="product-meta">
+                  <span class="quantity">x{{ record.orderItems[0].quantity }}</span>
+                  <span v-if="record.orderItems.length > 1" class="more">
+                    等{{ record.orderItems.length }}件商品
+                  </span>
+                </div>
+              </div>
+            </div>
+            <span v-else>-</span>
+          </template>
+          <template v-else-if="column.key === 'totalAmount'">
+            <span class="amount">¥{{ record.totalAmount?.toFixed(2) }}</span>
+          </template>
+          <template v-else-if="column.key === 'paymentMethod'">
+            <span v-if="record.paymentMethod">{{ record.paymentMethod }}</span>
+            <span v-else style="color: #999">未支付</span>
           </template>
           <template v-else-if="column.key === 'orderStatus'">
             <a-tag v-if="record.orderStatus === 0" color="orange">待支付</a-tag>
@@ -48,6 +72,12 @@
             <a-tag v-else-if="record.orderStatus === 2" color="cyan">待收货</a-tag>
             <a-tag v-else-if="record.orderStatus === 3" color="green">已完成</a-tag>
             <a-tag v-else color="red">已取消</a-tag>
+          </template>
+          <template v-else-if="column.key === 'shippingStatus'">
+            <a-tag v-if="record.shippingStatus === 0" color="default">未发货</a-tag>
+            <a-tag v-else-if="record.shippingStatus === 1" color="processing">已发货</a-tag>
+            <a-tag v-else-if="record.shippingStatus === 2" color="success">已签收</a-tag>
+            <a-tag v-else color="default">-</a-tag>
           </template>
           <template v-else-if="column.key === 'createTime'">
             {{ formatTime(record.createTime) }}
@@ -144,12 +174,16 @@ const searchForm = reactive({
 
 const columns = [
   { title: '订单号', dataIndex: 'orderNo', key: 'orderNo', width: 180 },
+  { title: '商品信息', key: 'productInfo', width: 300 },
   { title: '买家昵称', dataIndex: 'userNickname', key: 'userNickname', width: 120 },
   { title: '店铺名称', dataIndex: 'shopName', key: 'shopName', width: 150 },
+  { title: '收货人', dataIndex: 'receiverName', key: 'receiverName', width: 100 },
   { title: '订单金额', dataIndex: 'totalAmount', key: 'totalAmount', width: 120 },
+  { title: '支付方式', dataIndex: 'paymentMethod', key: 'paymentMethod', width: 100 },
   { title: '订单状态', dataIndex: 'orderStatus', key: 'orderStatus', width: 100 },
+  { title: '物流状态', dataIndex: 'shippingStatus', key: 'shippingStatus', width: 100 },
   { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 180 },
-  { title: '操作', key: 'action', width: 150 },
+  { title: '操作', key: 'action', fixed: 'right', width: 150 },
 ]
 
 const detailModalVisible = ref(false)
@@ -233,6 +267,49 @@ const formatTime = (time: string | undefined) => {
 .order-manage {
   :deep(.ant-table-cell) {
     vertical-align: middle;
+  }
+
+  .product-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .product-image {
+      flex-shrink: 0;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+
+    .product-detail {
+      flex: 1;
+      min-width: 0;
+
+      .product-name {
+        font-size: 14px;
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .product-meta {
+        font-size: 12px;
+        color: #999;
+
+        .quantity {
+          margin-right: 8px;
+        }
+
+        .more {
+          color: #1890ff;
+        }
+      }
+    }
+  }
+
+  .amount {
+    font-weight: 600;
+    color: #ff4d4f;
   }
 }
 </style>

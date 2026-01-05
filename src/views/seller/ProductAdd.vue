@@ -5,10 +5,34 @@
         <a-form-item label="商品名称" required>
           <a-input v-model:value="form.productName" placeholder="请输入商品名称" />
         </a-form-item>
-        <a-form-item label="商品主图URL" required>
-          <a-input v-model:value="form.mainImageUrl" placeholder="请输入商品主图URL" />
+        <a-form-item label="商品主图" required>
+          <a-upload
+            :show-upload-list="false"
+            :before-upload="beforeImageUpload"
+            :custom-request="handleImageUpload"
+            accept="image/*"
+          >
+            <a-button type="primary" :loading="imageUploading">
+              <upload-outlined />
+              {{ imageUploading ? '上传中...' : '上传图片' }}
+            </a-button>
+          </a-upload>
+          <a-button
+            v-if="form.mainImageUrl"
+            danger
+            style="margin-left: 8px"
+            @click="handleDeleteImage"
+          >
+            <delete-outlined />
+            删除图片
+          </a-button>
           <div v-if="form.mainImageUrl" style="margin-top: 8px">
-            <img :src="form.mainImageUrl" alt="商品主图预览" style="width: 120px; height: 120px; object-fit: cover; border: 1px solid #d9d9d9" />
+            <img :src="form.mainImageUrl" alt="商品主图预览" style="width: 120px; height: 120px; object-fit: cover; border: 1px solid #d9d9d9; border-radius: 4px" />
+          </div>
+          <div style="margin-top: 8px">
+            <a-typography-text type="secondary" style="font-size: 12px">
+              支持常见图片格式，大小不超过 5MB
+            </a-typography-text>
           </div>
         </a-form-item>
         <a-form-item label="商品描述">
@@ -53,9 +77,11 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
+import { UploadOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
 import { addProductUsingPost } from '@/api/productController'
 import { listShopByPageUsingPost } from '@/api/shopController'
+import { uploadProductPictureOssUsingPost, deleteFileByUrlOssUsingPost } from '@/api/fileController'
 import { useCategoryStore } from '@/stores/category'
 import { useUserStore } from '@/stores/user'
 
@@ -63,6 +89,7 @@ const router = useRouter()
 const categoryStore = useCategoryStore()
 const userStore = useUserStore()
 const loading = ref(false)
+const imageUploading = ref(false)
 const selectedCategory = ref<number[]>([])
 
 const form = reactive({
@@ -74,6 +101,17 @@ const form = reactive({
   categoryId: undefined as number | undefined,
   shopId: undefined as number | undefined,
 })
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/bmp',
+  'image/svg+xml'
+]
 
 onMounted(async () => {
   await categoryStore.fetchCategoryTree()
@@ -114,7 +152,7 @@ const handleSubmit = async () => {
     return
   }
   if (!form.mainImageUrl) {
-    message.error('请输入商品主图URL')
+    message.error('请上传商品主图')
     return
   }
   if (!form.price || form.price <= 0) {
@@ -156,6 +194,63 @@ const handleSubmit = async () => {
     message.error(error.message || '商品添加失败')
   } finally {
     loading.value = false
+  }
+}
+
+const beforeImageUpload = (file: File) => {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    message.error('只支持常见图片格式(JPG/PNG/GIF/WEBP/BMP/SVG)')
+    return false
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    message.error('图片大小不能超过 5MB')
+    return false
+  }
+  return true
+}
+
+const handleImageUpload = async (options: any) => {
+  const { file } = options
+
+  if (!beforeImageUpload(file)) {
+    return
+  }
+
+  imageUploading.value = true
+  try {
+    const res = await uploadProductPictureOssUsingPost({}, file)
+
+    if (res.code === 0 && res.data) {
+      form.mainImageUrl = res.data.url || ''
+      message.success('商品图片上传成功')
+    } else {
+      message.error(res.message || '上传失败')
+    }
+  } catch (error: any) {
+    console.error('商品图片上传失败 uid:', userStore.userInfo?.id, error)
+    message.error(error.message || '上传失败')
+  } finally {
+    imageUploading.value = false
+  }
+}
+
+const handleDeleteImage = async () => {
+  if (!form.mainImageUrl) {
+    return
+  }
+
+  try {
+    const res = await deleteFileByUrlOssUsingPost({ fileUrl: form.mainImageUrl })
+
+    if (res.code === 0) {
+      form.mainImageUrl = ''
+      message.success('商品图片删除成功')
+    } else {
+      message.error(res.message || '删除失败')
+    }
+  } catch (error: any) {
+    console.error('删除商品图片失败 uid:', userStore.userInfo?.id, 'fileUrl:', form.mainImageUrl, error)
+    message.error(error.message || '删除失败')
   }
 }
 </script>
