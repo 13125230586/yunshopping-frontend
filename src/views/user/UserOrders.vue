@@ -14,6 +14,9 @@
           <template v-if="column.key === 'payAmount'">
             {{ formatPrice(record.payAmount) }}
           </template>
+          <template v-if="column.key === 'createTime'">
+            {{ formatDate(record.createTime) }}
+          </template>
           <template v-if="column.key === 'action'">
             <a-space>
               <a-button v-if="record.orderStatus === 0" type="primary" size="small">去支付</a-button>
@@ -32,7 +35,7 @@ import { onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { useOrderStore } from '@/stores/order'
 import { OrderStatusText } from '@/constants'
-import { formatPrice } from '@/utils'
+import { formatPrice, formatDate } from '@/utils'
 
 const orderStore = useOrderStore()
 
@@ -41,7 +44,7 @@ const columns = [
   { title: '店铺', key: 'shopName', dataIndex: 'shopName' },
   { title: '订单状态', key: 'orderStatus' },
   { title: '订单金额', key: 'payAmount' },
-  { title: '下单时间', key: 'createTime', dataIndex: 'createTime' },
+  { title: '下单时间', key: 'createTime' },
   { title: '操作', key: 'action', width: 200 },
 ]
 

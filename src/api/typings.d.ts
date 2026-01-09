@@ -124,9 +124,27 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListCouponVO_ = {
+    code?: number
+    data?: CouponVO[]
+    message?: string
+  }
+
   type BaseResponseListDistributionDataVO_ = {
     code?: number
     data?: DistributionDataVO[]
+    message?: string
+  }
+
+  type BaseResponseListMemberBenefitLogVO_ = {
+    code?: number
+    data?: MemberBenefitLogVO[]
+    message?: string
+  }
+
+  type BaseResponseListMemberLevelVO_ = {
+    code?: number
+    data?: MemberLevelVO[]
     message?: string
   }
 
@@ -136,9 +154,21 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListUserCouponVO_ = {
+    code?: number
+    data?: UserCouponVO[]
+    message?: string
+  }
+
   type BaseResponseLong_ = {
     code?: number
     data?: number
+    message?: string
+  }
+
+  type BaseResponseMemberVO_ = {
+    code?: number
+    data?: MemberVO
     message?: string
   }
 
@@ -151,6 +181,12 @@ declare namespace API {
   type BaseResponsePageBannerVO_ = {
     code?: number
     data?: PageBannerVO_
+    message?: string
+  }
+
+  type BaseResponsePageMemberVO_ = {
+    code?: number
+    data?: PageMemberVO_
     message?: string
   }
 
@@ -272,6 +308,25 @@ declare namespace API {
     orderId: number
   }
 
+  type CouponVO = {
+    couponName?: string
+    couponType?: number
+    couponTypeText?: string
+    createTime?: string
+    discountAmount?: number
+    discountRate?: number
+    endTime?: string
+    forMemberLevel?: string
+    id?: number
+    minAmount?: number
+    shopId?: number
+    startTime?: string
+    status?: number
+    statusText?: string
+    totalCount?: number
+    usedCount?: number
+  }
+
   type createPaymentUsingPOSTParams = {
     /** orderId */
     orderId: number
@@ -302,6 +357,11 @@ declare namespace API {
     count?: number
     name?: string
     status?: number
+  }
+
+  type getAvailableCouponsUsingGETParams = {
+    /** orderAmount */
+    orderAmount?: number
   }
 
   type getOrderDetailUsingGETParams = {
@@ -341,6 +401,95 @@ declare namespace API {
     pageSize?: number
     /** productId */
     productId: number
+  }
+
+  type MemberActivateRequest = {
+    levelId?: number
+    paymentMethod?: string
+  }
+
+  type MemberBenefitLogVO = {
+    benefitType?: number
+    benefitTypeText?: string
+    benefitValue?: string
+    createTime?: string
+    description?: string
+    id?: number
+    memberId?: number
+    triggerEvent?: string
+    triggerEventText?: string
+    userId?: number
+  }
+
+  type MemberGrantRequest = {
+    levelId?: number
+    userId?: number
+    validDays?: number
+  }
+
+  type MemberLevelAddRequest = {
+    birthdayCouponId?: number
+    description?: string
+    discountRate?: number
+    icon?: string
+    levelCode?: string
+    levelName?: string
+    requiredGrowth?: number
+    sortOrder?: number
+    welcomeCouponId?: number
+  }
+
+  type MemberLevelUpdateRequest = {
+    birthdayCouponId?: number
+    description?: string
+    discountRate?: number
+    icon?: string
+    id?: number
+    levelCode?: string
+    levelName?: string
+    requiredGrowth?: number
+    sortOrder?: number
+    welcomeCouponId?: number
+  }
+
+  type MemberLevelVO = {
+    birthdayCouponId?: number
+    createTime?: string
+    description?: string
+    discountRate?: number
+    icon?: string
+    id?: number
+    levelCode?: string
+    levelName?: string
+    requiredGrowth?: number
+    sortOrder?: number
+    welcomeCouponId?: number
+  }
+
+  type MemberQueryRequest = {
+    current?: number
+    levelId?: number
+    pageSize?: number
+    sortField?: string
+    sortOrder?: string
+    status?: number
+    userId?: number
+  }
+
+  type MemberVO = {
+    activateTime?: string
+    createTime?: string
+    expireTime?: string
+    growthValue?: number
+    id?: number
+    levelId?: number
+    levelInfo?: MemberLevelVO
+    status?: number
+    statusText?: string
+    totalConsumeAmount?: number
+    userAvatar?: string
+    userId?: number
+    userName?: string
   }
 
   type OrderCreateRequest = {
@@ -403,6 +552,14 @@ declare namespace API {
     current?: number
     pages?: number
     records?: BannerVO[]
+    size?: number
+    total?: number
+  }
+
+  type PageMemberVO_ = {
+    current?: number
+    pages?: number
+    records?: MemberVO[]
     size?: number
     total?: number
   }
@@ -699,6 +856,8 @@ declare namespace API {
     gender?: number
     id?: number
     isDelete?: number
+    isMember?: number
+    memberId?: number
     phone?: string
     updateTime?: string
     userAccount?: string
@@ -707,6 +866,25 @@ declare namespace API {
     userPassword?: string
     userProfile?: string
     userRole?: string
+  }
+
+  type UserCouponVO = {
+    canUse?: boolean
+    couponId?: number
+    couponName?: string
+    couponType?: number
+    couponTypeText?: string
+    discountAmount?: number
+    discountRate?: number
+    endTime?: string
+    id?: number
+    minAmount?: number
+    receiveTime?: string
+    startTime?: string
+    status?: number
+    statusText?: string
+    unavailableReason?: string
+    useTime?: string
   }
 
   type userLoginUsingPOSTParams = {

@@ -41,6 +41,14 @@
           <picture-outlined />
           <span>轮播图管理</span>
         </a-menu-item>
+        <a-sub-menu key="member-sub">
+          <template #icon>
+            <crown-outlined />
+          </template>
+          <template #title>会员管理</template>
+          <a-menu-item key="members" @click="$router.push('/admin/members')">会员列表</a-menu-item>
+          <a-menu-item key="member-levels" @click="$router.push('/admin/member-levels')">等级配置</a-menu-item>
+        </a-sub-menu>
       </a-menu>
     </a-layout-sider>
     <a-layout>
@@ -84,6 +92,7 @@ import {
   ApartmentOutlined,
   ShoppingOutlined,
   PictureOutlined,
+  CrownOutlined,
 } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 

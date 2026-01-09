@@ -32,6 +32,7 @@
                 <a-menu>
                   <a-menu-item @click="$router.push('/user/profile')">个人中心</a-menu-item>
                   <a-menu-item @click="$router.push('/user/orders')">我的订单</a-menu-item>
+                  <a-menu-item @click="$router.push('/user/member')">会员中心</a-menu-item>
                   <a-menu-item v-if="userStore.isSeller" @click="$router.push('/seller')">
                     卖家中心
                   </a-menu-item>
@@ -85,7 +86,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
-import { ShoppingCartOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { ShoppingCartOutlined, UserOutlined, CrownOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import { useCategoryStore } from '@/stores/category'
