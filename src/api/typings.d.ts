@@ -389,6 +389,11 @@ declare namespace API {
     days?: number
   }
 
+  type getSellerOrderDetailUsingGETParams = {
+    /** orderId */
+    orderId: number
+  }
+
   type getShopByIdUsingGETParams = {
     /** id */
     id?: number
